@@ -31,7 +31,7 @@ public abstract class ItemEntityRendererMixin {
     private void removeSpin(float angle, float x, float y, float z) {}
 
     @Inject(method = "render(Lnet/minecraft/entity/ItemEntity;DDDFF)V",
-            at = @At(value="INVOKE", target = "applyItemBobbing", shift = At.Shift.AFTER))
+            at = @At(value="INVOKE", target = "Lnet/minecraft/client/render/entity/ItemEntityRenderer;applyItemBobbing(Lnet/minecraft/entity/ItemEntity;DDDFLnet/minecraft/client/render/model/block/BakedModel;)I", shift = At.Shift.AFTER))
     public void onRender(ItemEntity entity, double dx, double dy, double dz, float yaw, float tickDelta, CallbackInfo ci) {
         int id = entity.getNetworkId();
 
