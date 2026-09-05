@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "id": "itemphysiclite",
+  "name": "O-ItemPhysicLite",
+  "version": "${version}",
+  "environment": "*",
+  "description": "Adds physics to dropped items client-side.",
+  "authors": ["Tryfle"],
+  "entrypoints": {},
+  "mixins": [
+    "itemphysic.mixins.json"
+  ]
+}
