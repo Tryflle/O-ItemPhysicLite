@@ -1,8 +1,11 @@
 package xyz.tryfle.oitemphysic.mixin;
 
+import net.minecraft.block.SnowLayerBlock;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.render.entity.*;
 import net.minecraft.client.render.platform.GlStateManager;
 import net.minecraft.entity.ItemEntity;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -41,7 +44,7 @@ public abstract class ItemEntityRendererMixin {
         float movementYaw;
 
         if (vx * vx + vz * vz > 0.0001) {
-            movementYaw = (float) Math.toDegrees(Math.atan2(-vx, vz)); // tries to position item based on player throwing pos
+            movementYaw = (float) Math.toDegrees(Math.atan2(-vx, vz)); // tries to position item based on player throwing velocity
 
             float variation = id % 30 - 15; // slight random
             movementYaw += variation;
@@ -53,7 +56,9 @@ public abstract class ItemEntityRendererMixin {
         GlStateManager.rotatef(movementYaw, 0F, 1F, 0F);
 
         if (entity.onGround) {
-            GlStateManager.translatef(0f, -0.1f, 0f); // prevent floating (2: yes, it's necessary, unfortunately.)
+            if (!(Minecraft.getInstance().world.getBlockState(entity.getCommandSourceBlockPos()).getBlock() instanceof SnowLayerBlock))
+                GlStateManager.translatef(0f, -0.1f, 0f); // prevent floating (2: yes, it's necessary, unfortunately.)
+
             GlStateManager.rotatef(90F, 1F, 0F, 0F); // make it sit flat.
         } else {
             Vec3d velocity = new Vec3d(entity.velocityX, entity.velocityY, entity.velocityZ);
