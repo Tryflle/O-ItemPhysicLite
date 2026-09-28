@@ -18,6 +18,7 @@ dependencies {
     })
 
     modImplementation("net.fabricmc:fabric-loader:${"fabric_version"()}")
+    ploceus.dependOsl("0.21.0")
 }
 
 tasks.processResources {

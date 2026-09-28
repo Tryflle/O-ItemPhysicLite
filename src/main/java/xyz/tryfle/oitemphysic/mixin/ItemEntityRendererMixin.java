@@ -5,7 +5,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.render.entity.*;
 import net.minecraft.client.render.platform.GlStateManager;
 import net.minecraft.entity.ItemEntity;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -14,6 +13,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import xyz.tryfle.oitemphysic.config.OSLConfig;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,16 +26,20 @@ public abstract class ItemEntityRendererMixin {
 
     @ModifyVariable(method = "applyItemBobbing", at = @At("STORE"), ordinal = 2)
     private float removeBobbing(float g) {
-        return 0.0F; // this variable applied bobbing. it no longer applies bobbing.
+        if (!OSLConfig.toggled.get()) return g;
+        else return 0.0F; // this variable applied bobbing. it no longer applies bobbing.
     }
 
     @Redirect(method = "applyItemBobbing", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/client/render/platform/GlStateManager;rotatef(FFFF)V"))
-    private void removeSpin(float angle, float x, float y, float z) {}
+    private void removeSpin(float angle, float x, float y, float z) {
+        if (!OSLConfig.toggled.get()) GlStateManager.rotatef(angle, x, y, z);
+    }
 
     @Inject(method = "render(Lnet/minecraft/entity/ItemEntity;DDDFF)V",
             at = @At(value="INVOKE", target = "Lnet/minecraft/client/render/entity/ItemEntityRenderer;applyItemBobbing(Lnet/minecraft/entity/ItemEntity;DDDFLnet/minecraft/client/render/model/block/BakedModel;)I", shift = At.Shift.AFTER))
     public void onRender(ItemEntity entity, double dx, double dy, double dz, float yaw, float tickDelta, CallbackInfo ci) {
+        if (!OSLConfig.toggled.get()) return;
         int id = entity.getNetworkId();
 
         double vx = entity.velocityX;
@@ -63,9 +67,9 @@ public abstract class ItemEntityRendererMixin {
         } else {
             Vec3d velocity = new Vec3d(entity.velocityX, entity.velocityY, entity.velocityZ);
 
-            float spinX = (float) (velocity.x * 180.0F);
-            float spinZ = (float) (velocity.z * 180.0F);
-            float angle = ((entity.getAge() + tickDelta) * 8.0F);
+            float spinX = (float) (velocity.x * OSLConfig.fallingRotationSpeed.get()) * 180.0F;
+            float spinZ = (float) (velocity.z * OSLConfig.fallingRotationSpeed.get()) * 180.0F;
+            float angle = ((entity.getAge() + tickDelta) * 8.0F) * OSLConfig.fallingRotationSpeed.get();
 
             // spinny based on velocity and time
             GlStateManager.rotatef(angle, 1F, 0F, 0F);
