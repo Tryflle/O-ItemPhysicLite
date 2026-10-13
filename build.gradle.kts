@@ -10,6 +10,10 @@ ploceus {
     setIntermediaryGeneration(2)
 }
 
+repositories {
+    maven("https://repo.polyfrost.org/releases/")
+}
+
 dependencies {
     minecraft("com.mojang:minecraft:${"minecraft_version"()}")
     mappings(loom.layered {
@@ -18,6 +22,7 @@ dependencies {
     })
 
     modImplementation("net.fabricmc:fabric-loader:${"fabric_version"()}")
+    modImplementation("org.polyfrost.oneconfig:mod-toggles:1.0.0")
     ploceus.dependOsl("0.21.0")
 }
 
